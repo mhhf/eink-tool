@@ -14,7 +14,12 @@
       systems = [ "x86_64-linux" ];
       perSystem = { config, pkgs, system, ... }: let
         nodejs = pkgs.nodejs;
-        node2nixOutput = import ./nix { inherit pkgs nodejs system; };
+        # node2nixOutput = import ./nix { inherit pkgs nodejs system; };
+        node2nixOutput = import ./nix/default.nix { 
+          inherit pkgs nodejs system; 
+          # Explicitly add the path to node-env.nix
+          # node-env = ./nix/node-env.nix;
+        };
         nodeDeps = node2nixOutput.nodeDependencies;
         app = pkgs.stdenv.mkDerivation {
           name = "eink";
