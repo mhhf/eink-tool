@@ -1,0 +1,115 @@
+#!/usr/bin/env node
+
+const fs = require('fs')
+const { createCanvas, loadImage } = require('canvas')
+const width = 1304
+const height = 984
+var curPal = [[0, 0, 0], [255, 255, 255], [255, 0, 0]];
+
+const src_path = process.argv[2] || __dirname + "/img.jpg";
+const dst_path = process.argv[3] || '/tmp/eink.png';
+
+function setVal(p, i, c) {
+    p.data[i] = curPal[c][0];
+    p.data[i + 1] = curPal[c][1];
+    p.data[i + 2] = curPal[c][2];
+    p.data[i + 3] = 255;
+}
+function getErr(r, g, b, stdCol) {
+    r -= stdCol[0];
+    g -= stdCol[1];
+    b -= stdCol[2];
+    return r * r + g * g + b * b;
+}
+function getNear(r, g, b) {
+    var ind = 0;
+    var err = getErr(r, g, b, curPal[0]);
+    for (var i = 1; i < curPal.length; i++) {
+        var cur = getErr(r, g, b, curPal[i]);
+        if (cur < err) { err = cur; ind = i; }
+    }
+    return ind;
+}
+function addVal(c, r, g, b, k) {
+    return [c[0] + (r * k) / 32, c[1] + (g * k) / 32, c[2] + (b * k) / 32];
+}
+
+;(async () => {
+
+
+    const source = createCanvas(width, height)
+    const canvas = createCanvas(width, height)
+
+    const img = await loadImage(src_path);
+    source.getContext('2d').drawImage(img, 0, 0)
+
+    const pSrc = source.getContext('2d').getImageData(0, 0, width, height);
+    const pDst = canvas.getContext('2d').getImageData(0, 0, width, height);
+
+
+    var isLvl = 0
+    var isRed = 1
+
+    var palInd = 1
+
+    var index = 0;
+
+    var aInd = 0;
+    var bInd = 1;
+    var errArr = new Array(2);
+    errArr[0] = new Array(width);
+    errArr[1] = new Array(width);
+    for (var i = 0; i < width; i++)
+        errArr[bInd][i] = [0, 0, 0];
+    for (var j = 0; j < height; j++) {
+        var y = 0 + j;
+        if ((y < 0) || (y >= height)) {
+            for (var i = 0; i < width; i++ , index += 4)
+                setVal(pDst, index, (i + j) % 2 == 0 ? 1 : 0);
+            continue;
+        }
+        aInd = ((bInd = aInd) + 1) & 1;
+        for (var i = 0; i < width; i++)errArr[bInd][i] = [0, 0, 0];
+        for (var i = 0; i < width; i++) {
+            var x = 0 + i;
+            if ((x < 0) || (x >= width)) {
+                setVal(pDst, index, (i + j) % 2 == 0 ? 1 : 0);
+                index += 4;
+                continue;
+            }
+            var pos = (y * width + x) * 4;
+            var old = errArr[aInd][i];
+            var r = pSrc.data[pos] + old[0];
+            var g = pSrc.data[pos + 1] + old[1];
+            var b = pSrc.data[pos + 2] + old[2];
+            var colVal = curPal[getNear(r, g, b)];
+            pDst.data[index++] = colVal[0];
+            pDst.data[index++] = colVal[1];
+            pDst.data[index++] = colVal[2];
+            pDst.data[index++] = 255;
+            r = (r - colVal[0]);
+            g = (g - colVal[1]);
+            b = (b - colVal[2]);
+            if (i == 0) {
+                errArr[bInd][i] = addVal(errArr[bInd][i], r, g, b, 7.0);
+                errArr[bInd][i + 1] = addVal(errArr[bInd][i + 1], r, g, b, 2.0);
+                errArr[aInd][i + 1] = addVal(errArr[aInd][i + 1], r, g, b, 7.0);
+            } else if (i == width - 1) {
+                errArr[bInd][i - 1] = addVal(errArr[bInd][i - 1], r, g, b, 7.0);
+                errArr[bInd][i] = addVal(errArr[bInd][i], r, g, b, 9.0);
+            } else {
+                errArr[bInd][i - 1] = addVal(errArr[bInd][i - 1], r, g, b, 3.0);
+                errArr[bInd][i] = addVal(errArr[bInd][i], r, g, b, 5.0);
+                errArr[bInd][i + 1] = addVal(errArr[bInd][i + 1], r, g, b, 1.0);
+                errArr[aInd][i + 1] = addVal(errArr[aInd][i + 1], r, g, b, 7.0);
+            }
+        }
+    }
+
+    source.getContext('2d').putImageData(pDst, 0, 0);
+
+    const out = fs.createWriteStream(dst_path)
+    const stream = source.createPNGStream()
+    stream.pipe(out)
+
+})();

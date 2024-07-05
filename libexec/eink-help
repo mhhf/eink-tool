@@ -1,0 +1,19 @@
+#!/usr/bin/env node
+
+const PNG = require('png-js');
+
+const img_path = process.argv[2] || '/tmp/eink.png';
+
+function decode(path) {
+  return new Promise(resolve => {
+    PNG.decode(path, response => resolve(response));
+  });
+}
+
+;(async () => {
+
+    let data = await decode(img_path);
+    console.log(data);
+
+})();
+

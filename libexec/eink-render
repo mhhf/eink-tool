@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+input=${1:-`dirname "$0"`/../img.jpg}
+
+magick "$input" -resize "1304x984^" -gravity center -extent "1304x984" /tmp/eink-resized.png 
+didder --palette "black white red" -i /tmp/eink-resized.png -o /tmp/eink.png edm --serpentine FloydSteinberg
