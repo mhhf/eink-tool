@@ -4,6 +4,10 @@
 #include "Web_App.h"
 #include <stdlib.h>
 #include <Wire.h>
+#include <WiFi.h>
+
+unsigned long previousMillis = 0;
+unsigned long interval = 30000;
 
 /* Entry point ----------------------------------------------------------------*/
 void setup()
@@ -25,4 +29,12 @@ void setup()
 void loop()
 {
    Web_Listen();
+   unsigned long currentMillis = millis();
+   if ((WiFi.status() != WL_CONNECTED) && (currentMillis - previousMillis >=interval)) {
+       Serial.print(millis());
+       Serial.println("Reconnecting to WiFi...");
+       WiFi.disconnect();
+       WiFi.reconnect();
+       previousMillis = currentMillis;
+   }
 }

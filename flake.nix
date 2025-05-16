@@ -58,6 +58,7 @@
             cp package.json $out/package.json
             cp -r libexec $out/libexec
             cp -r img.jpg $out/
+            cp -r didders $out/
             ln -sf ${nodeDeps}/lib/node_modules $out/node_modules
 
             cp bin/eink $out/share/eink
@@ -89,7 +90,7 @@
             }
             {
               name = "ARDUINO_PORT";
-              value = "/dev/ttyACM0";
+              value = "/dev/ttyUSB0";
             }
             {
               name = "ARDUINO_BAUD";
@@ -122,6 +123,7 @@
             arduino-cli
             didder
             imagemagick
+            (python3.withPackages (ps: [ps.pyserial]))
           ];
         };
       };

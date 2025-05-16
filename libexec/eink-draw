@@ -94,7 +94,7 @@ function decode(path) {
     var bnext =  0, rynext = 0;
     var show = 0;
     // consoledebug('bimgm1s1m2s2 = ' + bimgm1s1m2s2.substr(bnext*30000,30000));
-    var url = 'http://192.168.178.103/';
+    var url = 'http://192.168.130.30/';
 
     xmlHttp = new XMLHttpRequest();
     xmlHttp.open('POST', url + 'EPD', true); 

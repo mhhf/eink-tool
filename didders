@@ -1,0 +1,50 @@
+random -0.5 0.5
+random -0.2 2.0
+random -0.7 0.7
+random -0.5 0.7
+bayer 4 4
+bayer 8 8
+bayer 16 16
+bayer 32 32
+bayer 4 8
+bayer 4 16
+bayer 8 16
+bayer 16 8
+bayer 16 4
+odm ClusteredDot4x4
+odm ClusteredDotDiagonal8x8
+odm Vertical5x3
+odm Horizontal3x5
+odm ClusteredDotDiagonal6x6
+odm ClusteredDotDiagonal8x8_2
+odm ClusteredDotDiagonal16x16
+odm ClusteredDot6x6
+odm ClusteredDotSpiral5x5
+odm ClusteredDotHorizontalLine
+odm ClusteredDotVerticalLine
+odm ClusteredDot8x8
+odm ClusteredDot6x6_2
+odm ClusteredDot6x6_3
+odm ClusteredDotDiagonal8x8_3
+edm Simple2D
+edm -s Simple2D
+edm FloydSteinberg
+edm -s FloydSteinberg
+edm FalseFloydSteinberg
+edm -s FalseFloydSteinberg
+edm JarvisJudiceNinke
+edm -s JarvisJudiceNinke
+edm Atkinson
+edm -s Atkinson
+edm Stucki
+edm -s Stucki
+edm Burkes
+edm -s Burkes
+edm Sierra
+edm -s Sierra
+edm TwoRowSierra
+edm -s TwoRowSierra
+edm SierraLite
+edm -s SierraLite
+edm StevenPigeon
+edm -s StevenPigeon

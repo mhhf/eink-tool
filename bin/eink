@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
+
+export EINK_RESOLUTION="1304x984"
+
 if [[ `file --mime-type $1 | grep "image/"` ]]; then
   export PATH=${0%/*/*}/libexec:$PATH
-	eink-render $1
+	eink-render -i $1
 	eink-draw
 else
 	PATH=${0%/*/*}/libexec:$PATH "${0##*/}-${1-help}" "${@:2}"

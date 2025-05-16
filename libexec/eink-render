@@ -1,6 +1,75 @@
 #!/usr/bin/env bash
 
-input=${1:-`dirname "$0"`/../img.jpg}
+set -x
 
-magick "$input" -resize "1304x984^" -gravity center -extent "1304x984" /tmp/eink-resized.png 
-didder --palette "black white red" -i /tmp/eink-resized.png -o /tmp/eink.png edm --serpentine FloydSteinberg
+style=31
+resize=1
+center=1
+input=`dirname "$0"`/../img.jpg
+script_dir="$(dirname "$0")"
+
+
+mapfile -t didders < "$script_dir/../didders"
+
+cmd=( magick )
+
+while test $# -gt 0; do
+  case "$1" in
+    -h|--help)
+      echo "prepare and render an image to be shown on the eink device"
+			echo "potentially resize and crop it and didder (black and white dot thingy, hihi)"
+      echo " "
+      echo "eink-render [options] "
+      echo " "
+      echo "options:"
+      echo "-h, --help                show brief help"
+			echo "-s, --style=num           specify an didder style (1-49)"
+			echo "-i, --image=file          image file to render"
+      echo "--no-resize               don't resize only crop"
+      echo "--no-center               don't crop to the center"
+      exit 0
+      ;;
+    -s|--style)
+      shift
+      if [[ "$1 <= 49" ]]; then
+        style=$1
+      fi
+      shift
+      ;;
+    --no-center*)
+      center=0
+      shift
+      ;;
+    --no-resize*)
+      resize=0
+      shift
+      ;;
+    -i)
+      shift
+			input=$1
+      shift
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+
+cmd+=( "$input" )
+
+if [[ $resize == 1 ]]; then
+	cmd+=( -resize "$EINK_RESOLUTION^" )
+fi
+
+if [[ $center == 1 ]]; then
+  cmd+=( -gravity center  )
+fi
+
+cmd+=( -extent "$EINK_RESOLUTION" /tmp/eink-resized.png )
+"${cmd[@]}"
+
+   
+cmd2=( didder )
+cmd2+=( --palette "black white red" -i /tmp/eink-resized.png -o /tmp/eink.png )
+cmd2+=( ${didders[$style]} )
+"${cmd2[@]}"
