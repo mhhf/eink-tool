@@ -11,7 +11,7 @@
       imports = [
         inputs.devshell.flakeModule
       ];
-      systems = [ "x86_64-linux" ];
+      systems = [ "x86_64-linux" "aarch64-linux" ];
       perSystem = { config, pkgs, system, ... }: let
         nodejs = pkgs.nodejs;
         # node2nixOutput = import ./nix { inherit pkgs nodejs system; };
