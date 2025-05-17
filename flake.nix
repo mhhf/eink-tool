@@ -36,6 +36,9 @@
           ];
           runtimeDependencies = with pkgs; [
             didder
+            gnugrep
+            file
+            coreutils
           ];
           buildPhase = ''
             runHook preBuild
